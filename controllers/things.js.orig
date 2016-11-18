@@ -1,0 +1,45 @@
+var dbConnection;
+var mongodb = require('mongodb');
+var ObjectID = require('mongodb').ObjectID;
+
+exports.setDBConnectionsFromApp = function(app) {
+	dbConnection = app.get("dbConnection");
+}
+
+
+
+exports.findAll = function(req, res) {
+
+	var collection = dbConnection.collection("Things");
+	var items = collection.find({}, function(err, docsCursor) {
+		res.type('application/json');
+		if (err){
+			res.status(500);
+			res.send( {success:false, msg:"database error"});
+			return;
+		}
+
+		var itemList = [];
+		docsCursor.each(function(err, item) {
+			if (item != null) {
+				var newItem = {};
+				newItem.id = item._id;
+				newItem.name = item.name;
+				newItem.location = item.location;
+
+				itemList.push(newItem);
+			}
+			else {
+				res.status(200);
+				res.json( { items : itemList});
+			}
+		});
+
+	});
+
+}
+
+//exports.findById = function(req, res) {
+//	var collection = dbConnection.collection("Things");
+
+	// check for valid Object(ID)
