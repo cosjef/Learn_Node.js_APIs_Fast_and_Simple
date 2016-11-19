@@ -112,3 +112,67 @@ var objID;
   }
 });
   }
+
+    exports.update = function(req, res) {
+
+      console.log(req.body);
+
+      var item = req.body;
+      var collection = dbConnection.collection("Things");
+
+      // check for valid Object(ID)
+      var objID;
+      try {
+        objID = ObjectID(req.params.id);
+      }
+      catch(e) {
+        res.status(500);
+        res.send({success:false, msg:"invalid object ID"});
+        return;
+      }
+
+      var items = collection.update({"_id": objID}, {"$set": item}, function(err, result) {
+        res.type('application/json');
+
+        if (result == null) {
+          console.log('Update failed');
+          res.status(400);
+          res.send({success:false, msg:"failed to update"});
+          return;
+        }
+        res.status(200);
+        res.json({});
+      });
+      }
+
+
+    exports.delete = function(req, res) {
+
+      var collection = dbConnection.collection("Things");
+
+     var objID;
+    try {
+    objID = ObjectID(req.params.id);
+   } catch(e) {
+    res.status(500);
+    res.send({success:false, msg:"invalid object id"});
+    return;
+   }
+
+      var items = collection.remove({"_id": objID}, function(err, status) {
+    res.type('application/json');
+
+       if (status.result.n == 0) {
+      console.log('Delete failed');
+      res.status(400);
+      res.send({success:false, msg:"failed to delete"});
+      return;
+    }
+    res.status(200);
+    res.json({});
+  });
+}
+
+
+  
+
