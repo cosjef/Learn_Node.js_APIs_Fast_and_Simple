@@ -7,6 +7,11 @@ var path = require('path');
 
 var app = express();
 
+// register JSON body parser for POST, UPDATE, DELETES
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true}));
+
+
 // Database connection information
 var db;
 var mongodbURL;

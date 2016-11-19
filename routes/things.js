@@ -5,8 +5,8 @@ module.exports = function(app) {
 
 	// These are the routes
 	app.get('/services/v1/things', thingsController.findAll);
-	//app.get('/services/v1/things/:id', thingsController.findByID);
-	//app.post('/services/v1/things', thingsController.add);
+	app.get('/services/v1/things/:id', thingsController.findById);
+	app.post('/services/v1/things', thingsController.add);
 	//app.put('/services/v1/things/:id', thingsController.update;
 	//app.delete('/services/v1/things/:id', thingsController.delete);
 

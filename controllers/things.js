@@ -37,3 +37,78 @@ exports.findAll = function(req, res) {
       });
   });
 }
+
+
+exports.findById = function(req, res) {
+
+  var collection = dbConnection.collection("Things");
+
+  // check for valid ObjectID in a try-catch loop
+var objID;
+  try {
+    objID = ObjectID(req.params.id);
+  } catch(e) {
+    res.status(500);
+    res.send({success:false, msg:"invalid object id"});
+    return;
+  }
+
+    var items = collection.findOne({"_id": objID}, function(err, item) {
+
+    res.type('application/json');
+
+    if (item != null) {
+      var newItem = {};
+      newItem.id = item._id;
+      newItem.name = item.name;
+      newItem.location = item.location;
+      res.status(200);
+      res.json(newItem);
+    }
+    else {
+      console.log('Item not found: ' + req.params.id);
+      res.status(400);
+      res.json({success:false, msg:"item not found"});
+    }
+  });
+  }
+
+    // get the POST body
+    exports.add = function(req, res) {
+
+    var item = req.body;
+    var newItem = {};
+    newItem.name = req.body.name;
+    newItem.location = req.body.location;
+    // date is in milliseconds, convert it to seconds
+    newItem.timestamp = Date.now() / 1000;
+    // get rid of floating point and replace with integer
+    newItem.timestamp = parseInt(newItem.timestamp, 10);
+
+    var collection = dbConnection.collection("Things");
+
+    // check to see if the item already exists
+    // if it does exist, skip the insert
+    var checkItem = collection.findOne({"name": newItem.name}, function(err, returnItem) {
+      if (returnItem != null) {
+        res.status(400);
+        res.json({success:false, msg:"item with name already in the database"})
+      } 
+        else {
+       // no item was found, so insert a new one
+       var items = collection.insertOne(newItem, function(err, returnItem) {
+        res.type('application/json');
+
+      if (returnItem != null) {
+        res.status(201);
+        res.json(newItem);
+      }
+      else {
+        console.log('Insert failed');
+        res.status(400);
+        res.json({});
+      }
+    });
+  }
+});
+  }
