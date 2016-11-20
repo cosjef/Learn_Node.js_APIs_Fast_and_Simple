@@ -90,6 +90,7 @@ MongoClient.connect(mongodbURL, function(err, dbConnection){
 	app.set("dbConnection", dbConnection);
 
 require('./routes/things')(app);
+require('./routes/users')(app);
 
 app.listen(Number(port_value));
 console.log("Node server running on port " + port_value);
