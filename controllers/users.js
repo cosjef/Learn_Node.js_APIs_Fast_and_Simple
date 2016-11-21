@@ -1,5 +1,6 @@
 var dbConnection;
 var ObjectID = require('mongodb').ObjectID;
+var uuid = require('node-uuid');
 
 exports.setDBConnectionsFromApp = function(app) {
 
@@ -117,3 +118,47 @@ exports.findNearMe = function(req, res) {
       });
   });
 }
+
+
+
+exports.signup = function(req, res) {
+
+    var item = req.body;
+    var newItem = {};
+    newItem.name = req.body.name;
+    newItem.emailAddress = req.body.emailAddress;
+    newItem.password = req.body.password;
+    newItem.cityState = req.body.cityState;
+    newItem.loc = [req.body.lon, req.body.lat];
+    newItem.uniqueUUID = uuid.v1();
+    newItem.timestamp = Date.now() / 1000;
+    newItem.timestamp = parseInt(newItem.timestamp, 10);
+
+    var collection = dbConnection.collection("users");
+
+    // check to see if the item already exists
+    // if it does exist, skip the insert
+    var checkItem = collection.findOne({"emailAddress": newItem.emailAddress}, function(err, returnItem) {
+        if (returnItem != null) {
+            res.status(400);
+            res.json({success:false, msg:"item with emailAddress already in the database"})
+        }
+        else {
+            // no item was found, so insert a new one
+            var items = collection.insertOne(newItem, function(err, returnItem) {
+                res.type('application/json');
+
+                if (returnItem != null) {
+                    res.status(201);
+                    res.json(newItem);
+                }
+                else {
+                    console.log('Insert failed');
+                    res.status(400);
+                    res.json({});
+                }
+            });
+        }
+    });
+}
+

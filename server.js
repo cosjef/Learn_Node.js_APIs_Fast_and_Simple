@@ -89,6 +89,10 @@ MongoClient.connect(mongodbURL, function(err, dbConnection){
 	//console.log(dbConnection);
 	app.set("dbConnection", dbConnection);
 
+// create mongodb index if it does not already exist
+var userCollection = dbConnection.collection("user");
+    userCollection.createIndex({"loc": "2d"});
+
 require('./routes/things')(app);
 require('./routes/users')(app);
 
